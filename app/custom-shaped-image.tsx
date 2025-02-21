@@ -1,8 +1,14 @@
 "use client";
 
 import Image, { ImageProps } from "next/image";
-import { EOF } from "node:dns/promises";
 import { useEffect, useRef, useState } from "react";
+
+type VisibleRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 type CustomShapedImageProps = ImageProps & {
   hoverSrc: string; // Image to show on hover
@@ -12,19 +18,23 @@ type CustomShapedImageProps = ImageProps & {
 const CustomShapedImage: React.FC<CustomShapedImageProps> = ({
   src,
   hoverSrc,
-  alt,
+  width, // desired width (optional)
+  height, // desired height (optional)
   ...rest
 }) => {
-  // Refs for the visible image and offscreen canvas for hit testing
+  // Refs for the underlying image and a hidden canvas (used both for cropping and hit testing)
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [visibleWidth, setVisibleWidth] = useState(0);
-  const [visibleHeight, setVisibleHeight] = useState(0);
-  const [xOffset, setXOffset] = useState(0);
-  const [yOffset, setYOffset] = useState(0);
 
-  // When the image loads, draw it on the hidden canvas
+  // State for hover effect, visible crop rectangle and natural image dimensions
+  const [isHovered, setIsHovered] = useState(false);
+  const [visibleRect, setVisibleRect] = useState<VisibleRect | null>(null);
+  const [imgDimensions, setImgDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  // When the image loads, draw it on the hidden canvas and compute the crop region (visibleRect)
   useEffect(() => {
     const img = imageRef.current;
     const canvas = canvasRef.current;
@@ -33,32 +43,58 @@ const CustomShapedImage: React.FC<CustomShapedImageProps> = ({
     if (!ctx) return;
 
     const handleLoad = () => {
+      // Set canvas size to the image’s natural dimensions
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
+      setImgDimensions({ width: img.naturalWidth, height: img.naturalHeight });
       ctx.drawImage(img, 0, 0);
 
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const pixels = imageData.data;
-      let minX = Infinity;
-      let minY = Infinity;
-      let maxX = -Infinity;
-      let maxY = -Infinity;
-
-      for (let i = 0; i < pixels.length; i += 4) {
-        if (pixels[i + 3] !== 0) {
-          const x = (i / 4) % canvas.width;
-          const y = Math.floor(i / 4 / canvas.width);
-          minX = Math.min(minX, x);
-          minY = Math.min(minY, y);
-          maxX = Math.max(maxX, x);
-          maxY = Math.max(maxY, y);
+      try {
+        // Get full image pixel data
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let minX = canvas.width;
+        let minY = canvas.height;
+        let maxX = 0;
+        let maxY = 0;
+        // Iterate through each pixel; consider any pixel with alpha > 0 as “visible”
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const index = (y * canvas.width + x) * 4;
+            const alpha = imageData.data[index + 3];
+            if (alpha > 0) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
         }
+        // If no visible pixels found, fallback to the full image.
+        if (maxX < minX || maxY < minY) {
+          setVisibleRect({
+            x: 0,
+            y: 0,
+            width: canvas.width,
+            height: canvas.height,
+          });
+        } else {
+          // Add 1 so the rectangle fully covers the visible pixels.
+          setVisibleRect({
+            x: minX,
+            y: minY,
+            width: maxX - minX + 1,
+            height: maxY - minY + 1,
+          });
+        }
+      } catch (error) {
+        // On error (for example due to CORS), use the full image.
+        setVisibleRect({
+          x: 0,
+          y: 0,
+          width: canvas.width,
+          height: canvas.height,
+        });
       }
-
-      setVisibleWidth(maxX - minX + 1);
-      setVisibleHeight(maxY - minY + 1);
-      setXOffset(minX);
-      setYOffset(minY);
     };
 
     if (img.complete) {
@@ -69,26 +105,77 @@ const CustomShapedImage: React.FC<CustomShapedImageProps> = ({
     }
   }, [src]);
 
-  // On mouse move, check the pixel data for transparency
+  // Determine final container dimensions based on the visibleRect and the provided width/height.
+  // The container’s aspect ratio will match that of the visible part.
+  let finalWidth = width || 300;
+  let finalHeight = height || 300;
+  let scale = 1;
+  if (visibleRect && imgDimensions) {
+    const visibleAspect = visibleRect.width / visibleRect.height;
+    if (width && !height) {
+      finalWidth = width;
+      finalHeight = Math.round(width / visibleAspect);
+    } else if (!width && height) {
+      finalHeight = height;
+      finalWidth = Math.round(height * visibleAspect);
+    } else if (width && height) {
+      // If both dimensions are provided, fit the visibleRect within those dimensions while preserving aspect ratio.
+      const desiredAspect = width / height;
+      if (visibleAspect > desiredAspect) {
+        finalWidth = width;
+        finalHeight = Math.round(width / visibleAspect);
+      } else {
+        finalHeight = height;
+        finalWidth = Math.round(height * visibleAspect);
+      }
+    } else {
+      // No dimensions provided: use the visible rectangle’s size.
+      finalWidth = visibleRect.width;
+      finalHeight = visibleRect.height;
+    }
+    // Determine how many display pixels per original image pixel.
+    scale = finalWidth / visibleRect.width;
+  }
+
+  // The style for the inner image (both original and hover) is set so that we only display the visibleRect portion.
+  const imageStyle =
+    visibleRect && imgDimensions
+      ? {
+          position: "absolute" as const,
+          // Offset the image so that the visibleRect aligns with the container's (0,0)
+          left: `-${visibleRect.x * scale}px`,
+          top: `-${visibleRect.y * scale}px`,
+          // Scale the entire image so that the visibleRect is scaled to finalWidth/finalHeight.
+          width: `${imgDimensions.width * scale}px`,
+          height: `${imgDimensions.height * scale}px`,
+        }
+      : {};
+
+  // Updated hit testing: when the mouse moves over the container,
+  // translate the container coordinates back to the original image coordinates (taking cropping into account)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const canvas = canvasRef.current;
-    const img = imageRef.current;
-    if (!canvas || !img) return;
-    const rect = img.getBoundingClientRect();
-    // Calculate the mouse coordinates relative to the image
-    const x = e.clientX - rect.left + xOffset;
-    const y = e.clientY - rect.top + yOffset;
+    if (!canvas || !visibleRect || !imgDimensions) return;
+    const containerRect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - containerRect.left;
+    const y = e.clientY - containerRect.top;
+    // Translate to original image coordinate space
+    const originalX = x / scale + visibleRect.x;
+    const originalY = y / scale + visibleRect.y;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     try {
-      const pixelData = ctx.getImageData(x, y, 1, 1).data;
-      const alpha = pixelData[3];
-      // Define a threshold for 95% opacity (95% of 255 ≈ 242)
+      const pixelData = ctx.getImageData(
+        Math.floor(originalX),
+        Math.floor(originalY),
+        1,
+        1,
+      ).data;
+      // Use the same hover threshold (95% opaque) as before.
       const threshold = 242;
-      setIsHovered(alpha >= threshold);
+      setIsHovered(pixelData[3] >= threshold);
     } catch (error) {
-      // If getImageData fails (e.g. due to CORS issues) fallback to no hover
       setIsHovered(false);
     }
   };
@@ -103,57 +190,52 @@ const CustomShapedImage: React.FC<CustomShapedImageProps> = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
-        width: visibleWidth,
-        height: visibleHeight,
+        width: finalWidth,
+        height: finalHeight,
         position: "relative",
         display: "inline-block",
+        overflow: "hidden",
       }}
     >
-      {/* Original image for hit testing */}
+      {/* This first div holds the original image for display and hit testing */}
       <div
         className="custom-shaped-image image-original"
         style={{
           position: "absolute",
           top: 0,
           left: 0,
-          width: visibleWidth,
-          height: visibleHeight,
           opacity: isHovered ? 0 : 1,
         }}
       >
         <Image
-          // Casting ref because Next.js Image might not forward it automatically.
           ref={imageRef as any}
           src={src}
           alt="Custom Shaped Image"
-          width={visibleWidth}
-          height={visibleHeight}
+          // The natural dimensions are used (if available); our CSS scales it.
+          width={imgDimensions ? imgDimensions.width : finalWidth}
+          height={imgDimensions ? imgDimensions.height : finalHeight}
+          style={imageStyle}
           {...rest}
         />
       </div>
 
-      {/* Hover image appears on top when isHovered is true */}
+      {/* The hover image (displayed on top when hover is detected) */}
       {isHovered && (
         <div
           className="custom-shaped-image image-hover"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: visibleWidth,
-            height: visibleHeight,
-          }}
+          style={{ position: "absolute", top: 0, left: 0 }}
         >
           <Image
             src={hoverSrc}
             alt="Hover Image"
-            width={visibleWidth}
-            height={visibleHeight}
+            width={imgDimensions ? imgDimensions.width : finalWidth}
+            height={imgDimensions ? imgDimensions.height : finalHeight}
+            style={imageStyle}
             {...rest}
           />
         </div>
       )}
-      {/* Hidden canvas for per-pixel hit detection */}
+      {/* Hidden canvas used for per-pixel hit testing and crop computation */}
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
