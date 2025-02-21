@@ -16,10 +16,14 @@ body {
 .image-hover-container {
     position: relative;
     display: inline-block;
+    pointer-events: none; /* Prevent the square container from capturing hover */
 }
 
 .image-original {
     transition: opacity 0.3s ease; /* Smooth transition for hiding */
+
+    /* hover works only inside the shape */
+    pointer-events: auto;
 }
 
 .image-hover {
@@ -27,7 +31,9 @@ body {
     top: 0;
     left: 0;
     opacity: 0; /* Start hidden */
-    transition: opacity 0.5s ease; /* Smooth transition for showing */
+    transition: opacity 0.3s ease; /* Smooth transition for showing */
+    /* hover works only inside the shape */
+    pointer-events: auto;
 }
 
 .image-hover-container:hover .image-hover {
@@ -36,6 +42,29 @@ body {
 
 .image-hover-container:hover .image-original {
     opacity: 0; /* Hide original image */
+}
+
+.custom-shaped-image {
+    display: block;
+    width: 100%;
+    height: auto;
+
+    /* Dynamically use the image URL as the mask */
+    -webkit-mask-image: var(--image-url); /*safari*/
+    mask-image: var(--image-url); /*others*/
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+
+    /* makes only visible part of image interactive */
+    pointer-events: auto;
+}
+
+/* interactive is only visible */
+.image-hover-container .custom-shaped-image {
+    pointer-events: auto;
 }
 
 .custom-shaped-image-var {
@@ -49,21 +78,6 @@ body {
     /* Clip image to its actual visible content */
     -webkit-mask-image: url("/your-image.png"); /* Safari */
     mask-image: url("/your-image.png"); /* Other browsers */
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    mask-size: contain;
-}
-
-.custom-shaped-image {
-    display: block;
-    width: 100%;
-    height: auto;
-
-    /* Dynamically use the image URL as the mask */
-    -webkit-mask-image: var(--image-url); /*safari*/
-    mask-image: var(--image-url); /*others*/
-
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-size: contain;
