@@ -7,7 +7,6 @@ export default function Home() {
       hoverSrc="/memory-box-hover.png"
       alt="Memory Box"
       width={1000}
-      height={200}
     />
   );
 }
