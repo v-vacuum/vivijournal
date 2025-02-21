@@ -5,13 +5,24 @@ export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          src="/title-vivijournal.png"
-          alt="Memory Box!"
-          width={300}
-          height={38}
-          priority
-        />
+        <div className="image-hover-container">
+          <Image
+            src="/title-vivijournal.png"
+            alt="Memory Box!"
+            width={300}
+            height={60}
+            priority
+            className="image-original"
+          />
+          <Image
+            src="/rumble.jpeg"
+            alt="Hovered Memory Box!"
+            width={60}
+            height={300}
+            priority
+            className="image-hover self-center"
+          />
+        </div>
         <nav className="mt-8">
           <ol className="text-sm flex items-center justify-center gap-4 font-[family-name:var(--font-geist-mono)">
             <li>
