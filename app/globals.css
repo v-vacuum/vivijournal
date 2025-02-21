@@ -37,3 +37,35 @@ body {
 .image-hover-container:hover .image-original {
     opacity: 0; /* Hide original image */
 }
+
+.custom-shaped-image-var {
+    display: block;
+    width: 100%;
+    height: auto;
+
+    /* Makes sure only the non-transparent parts are clickable */
+    pointer-events: auto;
+
+    /* Clip image to its actual visible content */
+    -webkit-mask-image: url("/your-image.png"); /* Safari */
+    mask-image: url("/your-image.png"); /* Other browsers */
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.custom-shaped-image {
+    display: block;
+    width: 100%;
+    height: auto;
+
+    /* Dynamically use the image URL as the mask */
+    -webkit-mask-image: var(--image-url); /*safari*/
+    mask-image: var(--image-url); /*others*/
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}

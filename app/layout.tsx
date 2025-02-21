@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vivi's Journal",
-  description: "",
+  title: "vivi's journal!",
+  description: "she be eating this shit up ngl",
 };
 
 export default function RootLayout({

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import CustomShapedImage from "@/components/CustomShapedImage";
 
 export default function Home() {
   return (
@@ -7,20 +8,20 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="image-hover-container">
           <Image
-            src="/title-vivijournal.png"
+            src="/memory-box.png"
             alt="Memory Box!"
-            width={300}
-            height={60}
+            width={1000}
+            height={20}
             priority
             className="image-original"
           />
           <Image
-            src="/rumble.jpeg"
+            src="/memory-box-hover.png"
             alt="Hovered Memory Box!"
-            width={60}
-            height={300}
+            width={1000}
+            height={20}
             priority
-            className="image-hover self-center"
+            className="image-hover"
           />
         </div>
         <nav className="mt-8">
@@ -51,7 +52,6 @@ export default function Home() {
             </li>
           </ol>
         </nav>
-
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li>
             <Link
