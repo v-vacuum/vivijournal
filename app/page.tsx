@@ -47,5 +47,12 @@ function Header() {
 }
 
 export default function Home() {
-  return <Header />;
+  return (
+    <CustomShapedHoverImage
+      src="/pages.png"
+      hoverSrc="/pages-hover.png"
+      alt="Pages Bookmark!"
+      width={500}
+    />
+  );
 }
