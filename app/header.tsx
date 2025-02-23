@@ -4,7 +4,7 @@ import CustomShapedHoverImage from "./custom-shaped-hover-image";
 export default function Header() {
   return (
     <nav>
-      <div className="flex flex-col items-center min-h-screen py-4">
+      <div className="flex flex-col items-center py-4">
         {/* Link to the home page */}
         <Link href="/">
           <CustomShapedHoverImage

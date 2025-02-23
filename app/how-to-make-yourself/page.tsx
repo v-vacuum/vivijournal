@@ -1,5 +1,5 @@
 import Header from "../header";
 
-export default function HowToMakeItYourself() {
+export default function HowToMakeYourself() {
   return <Header />;
 }
