@@ -13,39 +13,8 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.image-hover-container {
-    position: relative;
-    display: inline-block;
-    pointer-events: none; /* Prevent the square container from capturing hover */
-}
-
-.image-original {
-    transition: opacity 0.3s ease; /* Smooth transition for hiding */
-
-    /* hover works only inside the shape */
-    pointer-events: auto;
-}
-
-.image-hover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0; /* Start hidden */
-    transition: opacity 0.3s ease; /* Smooth transition for showing */
-    /* hover works only inside the shape */
-    pointer-events: auto;
-}
-
-.image-hover-container:hover .image-hover {
-    opacity: 1; /* Show hovered image */
-}
-
-.image-hover-container:hover .image-original {
-    opacity: 0; /* Hide original image */
-}
-
 .custom-shaped-image {
-    display: block;
+    display: inline-block;
     width: 100%;
     height: auto;
 
@@ -60,26 +29,4 @@ body {
 
     /* makes only visible part of image interactive */
     pointer-events: auto;
-}
-
-/* interactive is only visible */
-.image-hover-container .custom-shaped-image {
-    pointer-events: auto;
-}
-
-.custom-shaped-image-var {
-    display: block;
-    width: 100%;
-    height: auto;
-
-    /* Makes sure only the non-transparent parts are clickable */
-    pointer-events: auto;
-
-    /* Clip image to its actual visible content */
-    -webkit-mask-image: url("/your-image.png"); /* Safari */
-    mask-image: url("/your-image.png"); /* Other browsers */
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    mask-size: contain;
 }
