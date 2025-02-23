@@ -1,5 +1,5 @@
-import Header from "../page";
+import Header from "../header";
 
 export default function Others() {
-  return;
+  return <Header />;
 }

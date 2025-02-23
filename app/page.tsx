@@ -1,55 +1,5 @@
-import Image from "next/image";
-import Link from "next/link";
 import CustomShapedHoverImage from "./custom-shaped-hover-image";
-import HoverImage from "./hover-image";
-
-function Header() {
-  return (
-    <nav>
-      <div className="flex flex-col items-center min-h-screen py-4">
-        {/* Link to the home page */}
-        <Link href="/">
-          <CustomShapedHoverImage
-            src="/memory-box.png"
-            hoverSrc="/memory-box-hover.png"
-            alt="Memory Box"
-            width={500}
-            height={100}
-          />
-        </Link>
-
-        <ol className="text-sm flex items-center justify-center gap-4 font-[family-name:var(--font-geist-mono)]">
-          <li>
-            <Link
-              href="/about"
-              className="transition-colors hover:underline hover:underline-offset-4"
-            >
-              me
-            </Link>
-          </li>
-          <li>|</li>
-          <li>
-            <Link
-              href="/others"
-              className="transition-colors hover:underline hover:underline-offset-4"
-            >
-              others
-            </Link>
-          </li>
-          <li>|</li>
-          <li>
-            <Link
-              href="/how-to-make-yourself"
-              className="transition-colors hover:underline hover:underline-offset-4"
-            >
-              how to make yourself
-            </Link>
-          </li>
-        </ol>
-      </div>
-    </nav>
-  );
-}
+import Header from "./header";
 
 function Gallery() {
   // Define an array of image data. Add more image objects as needed.
@@ -58,6 +8,20 @@ function Gallery() {
       src: "/suki.png",
       hoverSrc: "/suki-hover.png",
       alt: "suki's cunty car",
+      width: 500,
+      height: 300,
+    },
+    {
+      src: "/pages.png",
+      hoverSrc: "/pages-hover.png",
+      alt: "pages book mark",
+      width: 500,
+      height: 300,
+    },
+    {
+      src: "/warhammer.png",
+      hoverSrc: "/warhammer-hover.png",
+      alt: "warhammer receipt",
       width: 500,
       height: 300,
     },
@@ -80,10 +44,5 @@ function Gallery() {
 }
 
 export default function Home() {
-  return (
-    <div>
-      <Header />
-      <Gallery />
-    </div>
-  );
+  return <Header />;
 }
