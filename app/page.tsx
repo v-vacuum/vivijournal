@@ -5,8 +5,8 @@ function Gallery() {
   // Define an array of image data. Add more image objects as needed.
   const images = [
     {
-      src: "/suki.png",
-      hoverSrc: "/suki-hover.png",
+      src: "/suki-car.png",
+      hoverSrc: "/suki-car-hover.png",
       alt: "suki's cunty car",
       width: 500,
       height: 300,
