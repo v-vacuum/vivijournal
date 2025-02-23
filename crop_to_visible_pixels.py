@@ -1,19 +1,81 @@
 import os
-import sys
 from PIL import Image
 
-def get_visible_bbox(image):
+def get_components(mask, min_area):
     """
-    Returns the bounding box (left, upper, right, lower) of the visible (alpha > 1)
-    pixels in the image. Returns None if no visible pixels are found.
+    Finds connected components in a binary mask (pixels are 0 or 255)
+    and returns a list of bounding boxes for those components whose area
+    is at least min_area.
     """
-    # Ensure image is in RGBA mode to access the alpha channel
+    width, height = mask.size
+    data = mask.load()
+    # Create a 2D visited array
+    visited = [[False] * width for _ in range(height)]
+    components = []
+
+    for y in range(height):
+        for x in range(width):
+            if visited[y][x]:
+                continue
+            if data[x, y] != 255:
+                visited[y][x] = True
+                continue
+
+            # Start flood fill for a new component.
+            stack = [(x, y)]
+            comp_pixels = []
+
+            while stack:
+                cx, cy = stack.pop()
+                if visited[cy][cx]:
+                    continue
+                visited[cy][cx] = True
+                if data[cx, cy] == 255:
+                    comp_pixels.append((cx, cy))
+                    # Check 4-connected neighbors.
+                    if cx > 0 and not visited[cy][cx - 1]:
+                        stack.append((cx - 1, cy))
+                    if cx < width - 1 and not visited[cy][cx + 1]:
+                        stack.append((cx + 1, cy))
+                    if cy > 0 and not visited[cy - 1][cx]:
+                        stack.append((cx, cy - 1))
+                    if cy < height - 1 and not visited[cy + 1][cx]:
+                        stack.append((cx, cy + 1))
+
+            # If the component is large enough, add its bounding box.
+            if len(comp_pixels) >= min_area:
+                xs = [p[0] for p in comp_pixels]
+                ys = [p[1] for p in comp_pixels]
+                # +1 for right and lower as PIL's crop box is non-inclusive
+                bbox = (min(xs), min(ys), max(xs) + 1, max(ys) + 1)
+                components.append(bbox)
+    return components
+
+def get_visible_bbox(image, min_area_ratio=0.001):
+    """
+    Computes the union bounding box of all connected regions of visible
+    (alpha > 1) pixels whose area exceeds min_area_ratio of the total image area.
+    If none are found, returns None.
+    """
     if image.mode != 'RGBA':
         image = image.convert('RGBA')
     alpha = image.getchannel('A')
-    # Create a binary mask: visible pixels (alpha > 1) become 255, others 0.
+    # Build a binary mask: visible pixels become 255, others 0.
     mask = alpha.point(lambda p: 255 if p > 1 else 0)
-    return mask.getbbox()
+    width, height = mask.size
+    total_area = width * height
+    min_area = total_area * min_area_ratio
+
+    components = get_components(mask, min_area)
+    if not components:
+        return None
+
+    # Union all component bounding boxes.
+    left = min(comp[0] for comp in components)
+    upper = min(comp[1] for comp in components)
+    right = max(comp[2] for comp in components)
+    lower = max(comp[3] for comp in components)
+    return (left, upper, right, lower)
 
 def union_bbox(bbox1, bbox2):
     """
@@ -36,7 +98,7 @@ def union_bbox(bbox1, bbox2):
 def crop_visible_pixels(image, bbox=None):
     """
     Crops the image to the provided bbox.
-    If bbox is None, it calculates the visible bbox.
+    If bbox is None, calculates the visible bbox.
     """
     if bbox is None:
         bbox = get_visible_bbox(image)
@@ -45,7 +107,7 @@ def crop_visible_pixels(image, bbox=None):
     return image
 
 def process_directory(directory):
-    # Group images by their base name (ignoring "-hover" suffix)
+    # Group images by their base name (ignoring "-hover" suffix).
     groups = {}
     for filename in os.listdir(directory):
         if filename.lower().endswith('.png'):
@@ -58,7 +120,6 @@ def process_directory(directory):
 
     for base, group in groups.items():
         if 'normal' in group and 'hover' in group:
-            # Process the pair together
             normal_path = os.path.join(directory, group['normal'])
             hover_path = os.path.join(directory, group['hover'])
             try:
@@ -66,10 +127,8 @@ def process_directory(directory):
                     normal_img = normal_img.convert('RGBA')
                     hover_img = hover_img.convert('RGBA')
 
-                    # Compute the visible bounding boxes for both images
                     bbox_normal = get_visible_bbox(normal_img)
                     bbox_hover = get_visible_bbox(hover_img)
-                    # Determine the union of the two bounding boxes
                     combined_bbox = union_bbox(bbox_normal, bbox_hover)
 
                     if combined_bbox:
@@ -85,7 +144,6 @@ def process_directory(directory):
             except Exception as e:
                 print(f"Error processing group {base}: {e}")
         else:
-            # Process a single image normally
             filename = group.get('normal') or group.get('hover')
             filepath = os.path.join(directory, filename)
             try:
