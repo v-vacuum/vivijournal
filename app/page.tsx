@@ -12,6 +12,7 @@ function Header() {
             hoverSrc="/memory-box-hover.png"
             alt="Memory Box"
             width={500}
+            height={300}
           />
         </Link>
 
@@ -52,8 +53,9 @@ function Gallery() {
     {
       src: "/suki.png",
       hoverSrc: "/suki-hover.png",
-      alt: "Suki's cunty car",
-      width: 400,
+      alt: "suki's cunty car",
+      width: 200,
+      height: 200,
     },
   ];
 
@@ -66,6 +68,7 @@ function Gallery() {
           hoverSrc={img.hoverSrc}
           alt={img.alt}
           width={img.width}
+          height={img.height}
         />
       ))}
     </div>
@@ -76,7 +79,27 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <Gallery />
+      <CustomShapedHoverImage
+        src="/suki.png"
+        hoverSrc="/suki-hover.png"
+        alt="suki's cunty car"
+        width={1000}
+        height={1000}
+      />
+      <CustomShapedHoverImage
+        src="/pages.png"
+        hoverSrc="/pages-hover.png"
+        alt="suki's cunty car"
+        width={600}
+        height={1200}
+      />
+      <CustomShapedHoverImage
+        src="/warhammer.png"
+        hoverSrc="/warhammer-hover.png"
+        alt="suki's cunty car"
+        width={600}
+        height={1200}
+      />
     </div>
   );
 }
