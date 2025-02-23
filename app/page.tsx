@@ -46,6 +46,37 @@ function Header() {
   );
 }
 
+function Gallery() {
+  // Define an array of image data. Add more image objects as needed.
+  const images = [
+    {
+      src: "/suki.png",
+      hoverSrc: "/suki-hover.png",
+      alt: "Suki's cunty car",
+      width: 400,
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+      {images.map((img, index) => (
+        <CustomShapedHoverImage
+          key={index}
+          src={img.src}
+          hoverSrc={img.hoverSrc}
+          alt={img.alt}
+          width={img.width}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
-  return <Header />;
+  return (
+    <div>
+      <Header />
+      <Gallery />
+    </div>
+  );
 }
