@@ -1,12 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import CustomShapedHoverImage from "./custom-shaped-hover-image";
+import HoverImage from "./hover-image";
 
 function Header() {
   return (
     <nav>
       <div className="flex flex-col items-center min-h-screen py-4">
-        <Link href={"/page.tsx"}>
+        {/* Link to the home page */}
+        <Link href="/">
           <CustomShapedHoverImage
             src="/memory-box.png"
             hoverSrc="/memory-box-hover.png"
@@ -15,26 +17,28 @@ function Header() {
           />
         </Link>
 
-        <ol className="text-sm flex items-center justify-center gap-4 font-[family-name:var(--font-geist-mono)">
+        <ol className="text-sm flex items-center justify-center gap-4 font-[family-name:var(--font-geist-mono)]">
           <li>
             <Link
-              href={"/about-me.tsx"}
+              href="/about"
               className="transition-colors hover:underline hover:underline-offset-4"
             >
               me
             </Link>
           </li>
+          <li>|</li>
           <li>
             <Link
-              href="/others.tsx"
+              href="/others"
               className="transition-colors hover:underline hover:underline-offset-4"
             >
               others
             </Link>
           </li>
+          <li>|</li>
           <li>
             <Link
-              href="/how-to-make-yourself.tsx"
+              href="/how-to-make-yourself"
               className="transition-colors hover:underline hover:underline-offset-4"
             >
               how to make yourself
@@ -76,7 +80,12 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <Gallery />
+      <HoverImage
+        src="/pages.png"
+        hoverSrc="/pages-hover.png"
+        alt="Pages Bookmark!"
+        width={400}
+      />
     </div>
   );
 }
