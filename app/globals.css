@@ -12,21 +12,3 @@ body {
     background: var(--background);
     font-family: Arial, Helvetica, sans-serif;
 }
-
-.custom-shaped-image {
-    display: inline-block;
-    width: 100%;
-    height: auto;
-
-    /* Dynamically use the image URL as the mask */
-    -webkit-mask-image: var(--image-url); /*safari*/
-    mask-image: var(--image-url); /*others*/
-
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    mask-size: contain;
-
-    /* makes only visible part of image interactive */
-    pointer-events: auto;
-}
