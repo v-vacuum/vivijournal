@@ -6,8 +6,8 @@ const images = [
     src: "/durama.png",
     hoverSrc: "/durama-hover.png",
     alt: "durama",
-    width: 350,
-    height: 400,
+    width: 400,
+    height: 450,
   },
   {
     id: 2,
@@ -30,15 +30,33 @@ const images = [
     src: "/miffy-figure.png",
     hoverSrc: "/miffy-figure-hover.png",
     alt: "miffy figure",
-    width: 300,
-    height: 350,
+    width: 250,
+    height: 300,
   },
   {
     id: 5,
     src: "/miffy.png",
     hoverSrc: "/miffy-hover.png",
     alt: "miffy sticky!",
+    width: 500,
+    height: 600,
+  },
+
+  {
+    id: 6,
+    src: "/leek.png",
+    hoverSrc: "/leek-hover.png",
+    alt: "leeks!",
     width: 400,
+    height: 500,
+  },
+
+  {
+    id: 7,
+    src: "/knife.png",
+    hoverSrc: "/knife-hover.png",
+    alt: "knfie!",
+    width: 700,
     height: 500,
   },
   // Add more images as needed
