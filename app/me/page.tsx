@@ -14,8 +14,8 @@ const images = [
     src: "/instax.png",
     hoverSrc: "/instax-hover.png",
     alt: "instax",
-    width: 550,
-    height: 350,
+    width: 660,
+    height: 500,
   },
   {
     id: 3,
