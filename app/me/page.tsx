@@ -15,7 +15,7 @@ const images = [
     hoverSrc: "/instax-hover.png",
     alt: "instax",
     width: 660,
-    height: 500,
+    height: 450,
   },
   {
     id: 3,
@@ -58,6 +58,30 @@ const images = [
     alt: "knfie!",
     width: 700,
     height: 500,
+  },
+  {
+    id: 8,
+    src: "/flower.png",
+    hoverSrc: "/flower-hover.png",
+    alt: "flower!",
+    width: 500,
+    height: 900,
+  },
+  {
+    id: 9,
+    src: "/instax-film.png",
+    hoverSrc: "/instax-film-hover.png",
+    alt: "instax-film!",
+    width: 400,
+    height: 600,
+  },
+  {
+    id: 10,
+    src: "/mify.png",
+    hoverSrc: "/mify-hover.png",
+    alt: "miffy pt2!",
+    width: 500,
+    height: 600,
   },
   // Add more images as needed
 ];
