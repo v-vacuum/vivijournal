@@ -83,6 +83,22 @@ const images = [
     width: 500,
     height: 600,
   },
+  {
+    id: 11,
+    src: "/ferris.png",
+    hoverSrc: "/ferris-hover.png",
+    alt: "ferris!",
+    width: 500,
+    height: 500,
+  },
+  {
+    id: 12,
+    src: "/pepper.png",
+    hoverSrc: "/pepper-hover.png",
+    alt: "pepper!",
+    width: 600,
+    height: 300,
+  },
   // Add more images as needed
 ];
 
