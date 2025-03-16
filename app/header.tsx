@@ -19,7 +19,7 @@ export default function Header() {
         <ol className="text-sm flex items-center justify-center gap-4 font-[family-name:var(--font-geist-mono)]">
           <li>
             <Link
-              href="/me"
+              href="/"
               className="transition-colors hover:underline hover:underline-offset-4"
             >
               me
@@ -28,10 +28,10 @@ export default function Header() {
           <li>|</li>
           <li>
             <Link
-              href="/others"
+              href="/us"
               className="transition-colors hover:underline hover:underline-offset-4"
             >
-              others
+              us
             </Link>
           </li>
           <li>|</li>
