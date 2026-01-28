@@ -2,6 +2,9 @@
 
 A personal journaling application built with Next.js and React, designed for capturing memories.
 
+<img width="1920" height="935" alt="image" src="https://github.com/user-attachments/assets/c89b8f34-f206-41e3-b463-74c77c4f76e7" />
+<img width="1904" height="933" alt="image" src="https://github.com/user-attachments/assets/5f5cfa21-62f6-4b37-b23e-16326c6feaf1" />
+
 ## Features
 
 - **Interactive Image Galleries**: Hover effects and responsive image displays for a dynamic browsing experience
