@@ -11,13 +11,13 @@ const inriaSerif = Inria_Serif({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://vivijournal.vercel.app"),
-  title: "vivi's journal!",
+  title: "leek's journal",
   description: "",
   icons: {
     icon: "/durama-favicon.png",
   },
   openGraph: {
-    title: "vivi's journal!",
+    title: "leek's journal",
     description: "",
     images: [
       {
